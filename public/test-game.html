@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Card Game - Two Player Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        .player-section {
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .player1-section {
+            border-color: #0d6efd;
+        }
+
+        .player2-section {
+            border-color: #198754;
+        }
+
+        .event-log {
+            height: 300px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-family: monospace;
+        }
+
+        .event-item {
+            padding: 5px;
+            margin: 2px 0;
+            border-radius: 3px;
+        }
+
+        .event-success {
+            background: #d1e7dd;
+        }
+
+        .event-error {
+            background: #f8d7da;
+        }
+
+        .event-info {
+            background: #cff4fc;
+        }
+
+        .card-display {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .card {
+            padding: 5px 10px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            margin: 5px;
+        }
+
+        .status-connected {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-disconnected {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .btn-sm {
+            margin: 2px;
+        }
+
+        .dealer-deck {
+            background: #212529;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .flip-history {
+            height: 200px;
+            overflow-y: auto;
+            background: white;
+            border: 1px solid #ddd;
+            padding: 10px;
+            border-radius: 4px;
+        }
+
+        .flip-item {
+            padding: 8px;
+            margin: 4px 0;
+            border-left: 3px solid #0d6efd;
+            background: #f8f9fa;
+            border-radius: 3px;
+            font-size: 13px;
+        }
+
+        .card-back {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .my-cards-section {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 6px;
+            border: 2px solid #0d6efd;
+        }
+
+        .opponent-cards {
+            background: #fff3cd;
+            padding: 10px;
+            border-radius: 6px;
+            border: 2px solid #ffc107;
+        }
+
+        .current-flip-card {
+            background: #fff;
+            border: 3px solid #198754;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .flip-card-large {
+            font-size: 48px;
+            font-weight: bold;
+            animation: flipIn 0.5s ease;
+        }
+
+        @keyframes flipIn {
+            from {
+                transform: rotateY(90deg);
+                opacity: 0;
+            }
+
+            to {
+                transform: rotateY(0deg);
+                opacity: 1;
+            }
+        }
+
+        .card {
+            font-size: 14px;
+            min-width: 45px;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container-fluid py-4">
+        <h1 class="text-center mb-4">🎮 Card Game - Two Player Test</h1>
+
+        <!-- Game Configuration -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0">⚙️ Game Configuration</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="form-label">Server URL</label>
+                                <input type="text" class="form-control" id="serverUrl" value="http://localhost:5000">
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Game Length</label>
+                                <select class="form-select" id="gameLength">
+                                    <option value="26">26 Cards</option>
+                                    <option value="52">52 Cards</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Max Players</label>
+                                <select class="form-select" id="maxPlayers">
+                                    <option value="2" selected>2 Players</option>
+                                    <option value="4">4 Players</option>
+                                    <option value="13">13 Players</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <label class="form-label">Bet Multiplier</label>
+                                <input type="number" class="form-control" id="betMultiplier" value="2" min="1">
+                            </div>
+                            <div class="col-md-3">
+                                <label class="form-label">Room Code</label>
+                                <input type="text" class="form-control" id="roomCode"
+                                    placeholder="Leave empty to create new">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Current Flip Card -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="current-flip-card">
+                    <div>
+                        <h5 class="mb-3">🃏 Current Flip Card</h5>
+                        <div id="currentFlipCard" class="flip-card-large text-muted">
+                            Waiting for game to start...
+                        </div>
+                        <div id="currentFlipInfo" class="mt-2 text-muted">
+                            <small>No flip yet</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dealer Deck & Flip History -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="dealer-deck">
+                    <h5 class="mb-3">🎴 Dealer Deck & Game State</h5>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <strong>Current Flip:</strong> <span id="currentFlip">0</span> / <span
+                                id="totalFlips">26</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Remaining Cards:</strong> <span id="remainingCards">26</span>
+                        </div>
+                        <div class="col-md-4">
+                            <strong>Game Status:</strong> <span id="globalGameStatus">WAITING</span>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-12">
+                            <div id="turnDisplay" class="alert alert-primary mb-2" style="display: none;">
+                                🎯 <strong>Turn:</strong> <strong id="turnPlayerName">Unknown</strong> has <span
+                                    id="turnCard">?</span>
+                            </div>
+                            <div id="timerDisplay" class="alert alert-warning mb-2" style="display: none;">
+                                ⏱️ Next auto-flip in: <strong id="timerCountdown">5</strong> seconds
+                            </div>
+                            <div id="flipRequestDisplay" class="alert alert-info mb-0" style="display: none;">
+                                💰 <strong id="flipRequestPlayer">Player</strong> wants to flip for <strong
+                                    id="flipRequestAmount">$0.00</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <h6>Dealer's Remaining Cards (Unflipped):</h6>
+                        <div id="dealerCards" class="card-display">
+                            <span class="card card-back">🎴</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flip History -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0">📜 Flip History</h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="flipHistory" class="flip-history">
+                            No flips yet. Game will start soon...
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Player 1 -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="player-section player1-section">
+                    <h4 class="text-primary mb-3">
+                        👤 Player 1
+                        <span id="p1Status" class="status-badge status-disconnected float-end">Disconnected</span>
+                    </h4>
+
+                    <!-- Authentication -->
+                    <div class="mb-3">
+                        <h6>Authentication</h6>
+                        <div class="input-group mb-2">
+                            <input type="email" class="form-control" id="p1Email" placeholder="Email"
+                                value="user01@yopmail.com">
+                            <input type="password" class="form-control" id="p1Password" placeholder="Password"
+                                value="securePassword123">
+                        </div>
+                        <button class="btn btn-sm btn-success" onclick="login(1)">Login</button>
+                        <button class="btn btn-sm btn-info" onclick="connectSocket(1)">Connect Socket</button>
+                        <button class="btn btn-sm btn-danger" onclick="disconnectSocket(1)">Disconnect</button>
+                    </div>
+                    <div class="mb-2">
+                        <small><strong>Token:</strong> <span id="p1Token" class="text-muted">Not logged
+                                in</span></small>
+                    </div>
+
+                    <!-- Room Actions -->
+                    <div class="mb-3">
+                        <h6>Room Actions</h6>
+                        <button class="btn btn-sm btn-primary" onclick="createRoom(1)">Create Room</button>
+                        <button class="btn btn-sm btn-success" onclick="joinRoom(1)">Join Room</button>
+                        <button class="btn btn-sm btn-warning" onclick="startGame(1)">Start Game</button>
+                    </div>
+
+                    <!-- Game Actions -->
+                    <div class="mb-3">
+                        <h6>Game Actions</h6>
+                        <button class="btn btn-sm btn-info" onclick="getCards(1)">Get My Cards</button>
+                        <button class="btn btn-sm btn-info" onclick="getScores(1)">Get Scores</button>
+                        <button class="btn btn-sm btn-info" onclick="getGameState(1)">Get Game State</button>
+                    </div>
+
+                    <!-- Flip Actions -->
+                    <div class="mb-3">
+                        <h6>Flip Actions</h6>
+                        <button class="btn btn-sm btn-warning" onclick="executeFlip(1)">Execute Flip</button>
+                        <!-- <div class="input-group input-group-sm mt-2">
+                            <input type="number" class="form-control" id="p1BidAmount" placeholder="Bid" value="1.00"
+                                step="0.01">
+                            <button class="btn btn-sm btn-danger" onclick="placeBid(1)">Place Bid</button>
+                        </div> -->
+                    </div>
+
+                    <!-- Game Info -->
+                    <div class="mb-3">
+                        <div><strong>Room ID:</strong> <span id="p1RoomId">-</span></div>
+                        <div><strong>Status:</strong> <span id="p1GameStatus">-</span></div>
+                        <div><strong>Score:</strong> <span id="p1Score">0</span></div>
+                        <div><strong>Cards:</strong> <span id="p1CardCount">0</span></div>
+                    </div>
+
+                    <!-- Cards Display -->
+                    <div class="mb-3">
+                        <div class="my-cards-section">
+                            <h6>🎴 My Cards (Player 1)</h6>
+                            <div id="p1Cards" class="card-display">No cards yet</div>
+                        </div>
+                    </div>
+
+                    <!-- Opponent's Card Count -->
+                    <!-- <div class="mb-3">
+                        <div class="opponent-cards">
+                            <h6>👤 Opponent's Cards</h6>
+                            <div id="p1OpponentInfo">Waiting for opponent...</div>
+                        </div>
+                    </div> -->
+
+                    <!-- Chat -->
+                    <div class="mb-3">
+                        <h6>💬 Chat</h6>
+                        <div id="p1Chat" class="event-log" style="height: 150px; background: #fff;"></div>
+                        <div class="input-group input-group-sm mt-2">
+                            <input type="text" class="form-control" id="p1ChatInput" placeholder="Type message..."
+                                onkeypress="if(event.key==='Enter') sendChat(1)">
+                            <button class="btn btn-sm btn-primary" onclick="sendChat(1)">Send</button>
+                        </div>
+                    </div>
+
+                    <!-- Event Log -->
+                    <div>
+                        <h6>Event Log</h6>
+                        <div id="p1EventLog" class="event-log"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Player 2 -->
+            <div class="col-md-6">
+                <div class="player-section player2-section">
+                    <h4 class="text-success mb-3">
+                        👤 Player 2
+                        <span id="p2Status" class="status-badge status-disconnected float-end">Disconnected</span>
+                    </h4>
+
+                    <!-- Authentication -->
+                    <div class="mb-3">
+                        <h6>Authentication</h6>
+                        <div class="input-group mb-2">
+                            <input type="email" class="form-control" id="p2Email" placeholder="Email"
+                                value="user02@yopmail.com">
+                            <input type="password" class="form-control" id="p2Password" placeholder="Password"
+                                value="securePassword123">
+                        </div>
+                        <button class="btn btn-sm btn-success" onclick="login(2)">Login</button>
+                        <button class="btn btn-sm btn-info" onclick="connectSocket(2)">Connect Socket</button>
+                        <button class="btn btn-sm btn-danger" onclick="disconnectSocket(2)">Disconnect</button>
+                    </div>
+                    <div class="mb-2">
+                        <small><strong>Token:</strong> <span id="p2Token" class="text-muted">Not logged
+                                in</span></small>
+                    </div>
+
+                    <!-- Room Actions -->
+                    <div class="mb-3">
+                        <h6>Room Actions</h6>
+                        <button class="btn btn-sm btn-primary" onclick="createRoom(2)">Create Room</button>
+                        <button class="btn btn-sm btn-success" onclick="joinRoom(2)">Join Room</button>
+                        <button class="btn btn-sm btn-warning" onclick="startGame(2)">Start Game</button>
+                    </div>
+
+                    <!-- Game Actions -->
+                    <div class="mb-3">
+                        <h6>Game Actions</h6>
+                        <button class="btn btn-sm btn-info" onclick="getCards(2)">Get My Cards</button>
+                        <button class="btn btn-sm btn-info" onclick="getScores(2)">Get Scores</button>
+                        <button class="btn btn-sm btn-info" onclick="getGameState(2)">Get Game State</button>
+                    </div>
+
+                    <!-- Flip Actions -->
+                    <div class="mb-3">
+                        <h6>Flip Actions</h6>
+                        <button class="btn btn-sm btn-warning" onclick="executeFlip(2)">Execute Flip</button>
+                        <!-- <div class="input-group input-group-sm mt-2">
+                            <input type="number" class="form-control" id="p2BidAmount" placeholder="Bid" value="1.00"
+                                step="0.01">
+                            <button class="btn btn-sm btn-danger" onclick="placeBid(2)">Place Bid</button>
+                        </div> -->
+                    </div>
+
+                    <!-- Game Info -->
+                    <div class="mb-3">
+                        <div><strong>Room ID:</strong> <span id="p2RoomId">-</span></div>
+                        <div><strong>Status:</strong> <span id="p2GameStatus">-</span></div>
+                        <div><strong>Score:</strong> <span id="p2Score">0</span></div>
+                        <div><strong>Cards:</strong> <span id="p2CardCount">0</span></div>
+                    </div>
+
+                    <!-- Cards Display -->
+                    <div class="mb-3">
+                        <div class="my-cards-section">
+                            <h6>🎴 My Cards (Player 2)</h6>
+                            <div id="p2Cards" class="card-display">No cards yet</div>
+                        </div>
+                    </div>
+
+                    <!-- Opponent's Card Count -->
+                    <!-- <div class="mb-3">
+                        <div class="opponent-cards">
+                            <h6>👤 Opponent's Cards</h6>
+                            <div id="p2OpponentInfo">Waiting for opponent...</div>
+                        </div>
+                    </div> -->
+
+                    <!-- Chat -->
+                    <div class="mb-3">
+                        <h6>💬 Chat ( while waiting in room )</h6>
+                        <div id="p2Chat" class="event-log" style="height: 150px; background: #fff;"></div>
+                        <div class="input-group input-group-sm mt-2">
+                            <input type="text" class="form-control" id="p2ChatInput" placeholder="Type message..."
+                                onkeypress="if(event.key==='Enter') sendChat(2)">
+                            <button class="btn btn-sm btn-primary" onclick="sendChat(2)">Send</button>
+                        </div>
+                    </div>
+
+                    <!-- Event Log -->
+                    <div>
+                        <h6>Event Log</h6>
+                        <div id="p2EventLog" class="event-log"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Test Flow -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">🚀 Quick Test Flow</h5>
+                    </div>
+                    <div class="card-body">
+                        <button class="btn btn-primary" onclick="quickTestFlow()">Run Complete Test Flow</button>
+                        <button class="btn btn-secondary" onclick="clearAllLogs()">Clear All Logs</button>
+                        <p class="mt-2 mb-0 text-muted">
+                            <small>This will: Register both players → Login → Connect sockets → Player 1 creates room →
+                                Player 2 joins → Auto-start game</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let state = {
+            p1: { token: null, socket: null, roomId: null, userId: null, username: null },
+            p2: { token: null, socket: null, roomId: null, userId: null, username: null },
+            gameState: {
+                dealerDeck: [],
+                currentFlip: 0,
+                totalFlips: 26,
+                flippedCards: [],
+                status: 'WAITING',
+                currentTurnPlayer: null,
+                currentTurnUsername: null,
+                nextCard: null
+            },
+            timer: {
+                interval: null,
+                remaining: 0,
+                active: false
+            },
+            activeFlipRequest: null
+        };
+
+        // Timer countdown function
+        function startCountdown(seconds) {
+            // Clear any existing timer
+            if (state.timer.interval) {
+                clearInterval(state.timer.interval);
+            }
+
+            state.timer.remaining = seconds;
+            state.timer.active = true;
+
+            const timerDisplay = document.getElementById('timerDisplay');
+            const timerCountdown = document.getElementById('timerCountdown');
+
+            timerDisplay.style.display = 'block';
+            timerCountdown.textContent = seconds;
+
+            state.timer.interval = setInterval(() => {
+                state.timer.remaining--;
+
+                if (state.timer.remaining <= 0) {
+                    clearInterval(state.timer.interval);
+                    timerDisplay.style.display = 'none';
+                    state.timer.active = false;
+                } else {
+                    timerCountdown.textContent = state.timer.remaining;
+
+                    // Change color based on time remaining
+                    if (state.timer.remaining <= 2) {
+                        timerDisplay.className = 'alert alert-danger mb-0';
+                    } else if (state.timer.remaining <= 3) {
+                        timerDisplay.className = 'alert alert-warning mb-0';
+                    } else {
+                        timerDisplay.className = 'alert alert-info mb-0';
+                    }
+                }
+            }, 1000);
+        }
+
+        function stopCountdown() {
+            if (state.timer.interval) {
+                clearInterval(state.timer.interval);
+                state.timer.interval = null;
+            }
+            state.timer.remaining = 0;
+            state.timer.active = false;
+            document.getElementById('timerDisplay').style.display = 'none';
+        }
+
+        function showFlipRequest(username, amount) {
+            const flipRequestDisplay = document.getElementById('flipRequestDisplay');
+            const flipRequestPlayer = document.getElementById('flipRequestPlayer');
+            const flipRequestAmount = document.getElementById('flipRequestAmount');
+
+            flipRequestPlayer.textContent = username;
+            flipRequestAmount.textContent = `$${parseFloat(amount).toFixed(2)}`;
+            flipRequestDisplay.style.display = 'block';
+        }
+
+        function hideFlipRequest() {
+            document.getElementById('flipRequestDisplay').style.display = 'none';
+        }
+
+        function showTurnDisplay(username, card) {
+            const turnDisplay = document.getElementById('turnDisplay');
+            const turnPlayerName = document.getElementById('turnPlayerName');
+            const turnCard = document.getElementById('turnCard');
+
+            turnPlayerName.textContent = username || 'Unknown';
+            turnCard.innerHTML = formatCard(card) || '?';
+            turnDisplay.style.display = 'block';
+
+            // Update state
+            state.gameState.currentTurnUsername = username;
+            state.gameState.nextCard = card;
+        }
+
+        function hideTurnDisplay() {
+            document.getElementById('turnDisplay').style.display = 'none';
+        }
+
+        function updateButtonStates() {
+            // Update Execute Flip buttons for both players
+            [1, 2].forEach(player => {
+                const myUserId = state[`p${player}`].userId;
+                const currentTurnPlayer = state.gameState.currentTurnPlayer;
+                const hasActiveFlipRequest = state.activeFlipRequest !== null;
+                const isMyTurn = currentTurnPlayer && myUserId ? currentTurnPlayer === myUserId : player === 1;
+                const isInProgress = state.gameState.status === 'IN_PROGRESS';
+
+                // Find buttons by scanning parent
+                const playerSection = document.getElementById(`p${player}Cards`)?.closest('.player-section');
+                if (!playerSection) return;
+
+                const flipButtons = Array.from(playerSection.querySelectorAll('button')).filter(btn =>
+                    btn.textContent.includes('Execute Flip')
+                );
+                const bidButtons = Array.from(playerSection.querySelectorAll('button')).filter(btn =>
+                    btn.textContent.includes('Place Bid')
+                );
+
+                flipButtons.forEach(btn => {
+                    // Enable Execute Flip only if:
+                    // 1. Game is in progress
+                    // 2. It's your turn OR you have an active flip request
+                    const shouldEnable = isInProgress && (isMyTurn || (hasActiveFlipRequest && state.activeFlipRequest === myUserId));
+                    btn.disabled = !shouldEnable;
+
+                    if (shouldEnable) {
+                        btn.classList.remove('btn-secondary');
+                        btn.classList.add('btn-warning');
+                    } else {
+                        btn.classList.remove('btn-warning');
+                        btn.classList.add('btn-secondary');
+                    }
+                });
+
+                bidButtons.forEach(btn => {
+                    // Enable Place Bid only if game is in progress and not your turn (or there's already a request)
+                    btn.disabled = !isInProgress;
+
+                    if (isInProgress) {
+                        btn.classList.remove('btn-secondary');
+                        btn.classList.add('btn-danger');
+                    } else {
+                        btn.classList.remove('btn-danger');
+                        btn.classList.add('btn-secondary');
+                    }
+                });
+            });
+        }
+
+        // Comprehensive logging
+        function logAll(message, data) {
+            console.log(`[GAME LOG] ${message}`, data || '');
+            if (data) {
+                console.log(`[GAME DATA]`, JSON.stringify(data, null, 2));
+            }
+        }
+
+        // Format card with suit symbols
+        function formatCard(card) {
+            if (!card) return '🎴';
+            const cardStr = String(card);
+
+            // Replace suit letters with symbols
+            let formatted = cardStr
+                .replace(/♠/g, '♠️')
+                .replace(/♥/g, '♥️')
+                .replace(/♦/g, '♦️')
+                .replace(/♣/g, '♣️');
+
+            // Add color based on suit
+            if (formatted.includes('♥️') || formatted.includes('♦️')) {
+                return `<span style="color: #dc3545;">${formatted}</span>`;
+            } else {
+                return `<span style="color: #212529;">${formatted}</span>`;
+            }
+        }
+
+        function getServerUrl() {
+            return document.getElementById('serverUrl').value.trim();
+        }
+
+        function log(player, message, type = 'info') {
+            const logEl = document.getElementById(`p${player}EventLog`);
+            const time = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'event-error' : type === 'success' ? 'event-success' : 'event-info';
+            logEl.innerHTML += `<div class="event-item ${className}">[${time}] ${message}</div>`;
+            logEl.scrollTop = logEl.scrollHeight;
+        }
+
+        function clearAllLogs() {
+            document.getElementById('p1EventLog').innerHTML = '';
+            document.getElementById('p2EventLog').innerHTML = '';
+        }
+
+        function updateStatus(player, connected) {
+            const statusEl = document.getElementById(`p${player}Status`);
+            if (connected) {
+                statusEl.textContent = 'Connected';
+                statusEl.className = 'status-badge status-connected float-end';
+            } else {
+                statusEl.textContent = 'Disconnected';
+                statusEl.className = 'status-badge status-disconnected float-end';
+            }
+        }
+
+        // Authentication
+        async function register(player) {
+            const email = document.getElementById(`p${player}Email`).value;
+            const password = document.getElementById(`p${player}Password`).value;
+            const username = `Player${player}`;
+
+            log(player, `Registering ${email}...`);
+
+            try {
+                const res = await fetch(`${getServerUrl()}/api/v1/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password, username })
+                });
+                const data = await res.json();
+
+                if (data.status) {
+                    log(player, `✅ Registered successfully`, 'success');
+                } else {
+                    log(player, `❌ Registration failed: ${data.message}`, 'error');
+                }
+            } catch (err) {
+                log(player, `❌ Error: ${err.message}`, 'error');
+            }
+        }
+
+        async function login(player) {
+            const email = document.getElementById(`p${player}Email`).value;
+            const password = document.getElementById(`p${player}Password`).value;
+
+            log(player, `Logging in ${email}...`);
+
+            try {
+                const res = await fetch(`${getServerUrl()}/api/v1/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                console.log("data", data, data, data.data.token, Boolean(data.status && data.data.token));
+
+                if (data.status && data.data.token) {
+                    state[`p${player}`].token = data.data.token;
+                    state[`p${player}`].userId = data.data.user._id;
+                    state[`p${player}`].username = data.data.user.username;
+                    document.getElementById(`p${player}Token`).textContent = data.data.token.substring(0, 20) + '...';
+                    console.log("player state", state, state[`p${player}`]);
+
+                    log(player, `✅ Logged in successfully. User ID: ${data.data.user._id}`, 'success');
+                } else {
+                    log(player, `❌ Login failed: ${data.message}`, 'error');
+                }
+            } catch (err) {
+                log(player, `❌ Error: ${err.message}`, 'error');
+            }
+        }
+
+        function connectSocket(player) {
+            const token = state[`p${player}`].token;
+            if (!token) {
+                log(player, '❌ Please login first', 'error');
+                return;
+            }
+
+            log(player, 'Connecting to Socket.IO...');
+
+            const socket = io(getServerUrl(), {
+                extraHeaders: { token }
+            });
+
+            socket.on('connect', () => {
+                log(player, `✅ Socket connected: ${socket.id}`, 'success');
+                updateStatus(player, true);
+            });
+
+            socket.on('disconnect', () => {
+                log(player, '❌ Socket disconnected', 'error');
+                updateStatus(player, false);
+            });
+
+            // Room events
+            socket.on('room_created', (data) => {
+                console.log("data_room_created", data);
+                log(player, `📢 Room created: ${JSON.stringify(data)}`, 'info');
+            });
+
+            socket.on('player_joined', (data) => {
+                console.log("data_player_joined", data);
+                log(player, `📢 Player joined: ${data.player.username}`, 'success');
+                document.getElementById(`p${player}GameStatus`).textContent = `Players: ${data.currentPlayers}/${data.maxPlayers}`;
+            });
+
+            socket.on('game_auto_starting', (data) => {
+                console.log("data_game_auto_starting", data);
+                log(player, `📢 Game auto-starting in ${data.countdown} seconds...`, 'success');
+            });
+
+            socket.on('game_starting', (data) => {
+                console.log("data_game_starting", data);
+                log(player, `📢 Game starting in ${data.startingIn} seconds!`, 'success');
+                document.getElementById(`p${player}GameStatus`).textContent = 'Starting...';
+            });
+
+            socket.on('cards_distributed', (data) => {
+                console.log("data_cards_distributed", data);
+                const cards = data.yourCards || [];
+                const totalCards = data.totalCards || cards.length || 0;
+
+                // Save cards in state
+                state[`p${player}`].cards = cards;
+
+                log(player, `📢 Cards distributed: ${totalCards} cards - [${cards.join(', ')}]`, 'success');
+                displayCards(player, cards);
+                document.getElementById(`p${player}CardCount`).textContent = totalCards;
+            });
+
+            socket.on('initial_state', (data) => {
+                logAll('initial_state received', data);
+                console.log("data_initial_state", data);
+
+                const currentFlip = data.currentFlip || 0;
+                const gameLength = data.gameLength || 26;
+                const status = data.status || 'IN_PROGRESS';
+                const players = data.players || [];
+
+                log(player, `📢 Game started! Flip: ${currentFlip}/${gameLength}`, 'success');
+                document.getElementById(`p${player}GameStatus`).textContent = status;
+
+                // Initialize dealer deck (all cards at start)
+                state.gameState.dealerDeck = Array(gameLength).fill(0).map((_, i) => i);
+                state.gameState.currentFlip = currentFlip;
+                state.gameState.totalFlips = gameLength;
+                state.gameState.status = status;
+                state.gameState.flippedCards = [];
+
+                // Update global game state
+                updateGameState(data);
+
+                // Update opponent info
+                // updateOpponentInfo(player, players);
+
+                // Initialize dealer deck display
+                updateDealerDeckDisplay();
+
+                // Update deck users
+                getCards(1)
+                getCards(2)
+
+                // Update button states
+                updateButtonStates();
+            });
+
+            socket.on('card_flipped', (data) => {
+                logAll('card_flipped received', data);
+                console.log("data_card_flipped", data);
+
+                const flipNumber = data.flipNumber || 0;
+                const revealedCard = data.revealedCard || 'Unknown';
+                const matchedPlayer = data.matchedPlayer || { userId: 'Unknown', username: 'Unknown', scoreChange: 0 };
+                const scoreChange = matchedPlayer.scoreChange || 0;
+                const rule = data.rule || { description: 'No rule', type: 'NO_CHANGE' };
+                const remainingCards = data.remainingCards || [];
+
+                // Get username from backend data (preferred) or fallback to state
+                let playerName = matchedPlayer.username || 'Unknown';
+                if (playerName === 'Unknown') {
+                    if (state.p1.userId === matchedPlayer.userId) {
+                        playerName = state.p1.username || 'Player 1';
+                    } else if (state.p2.userId === matchedPlayer.userId) {
+                        playerName = state.p2.username || 'Player 2';
+                    }
+                }
+
+                log(player, `📢 Card flipped #${flipNumber}: ${revealedCard} → ${playerName} (+${scoreChange} - ${rule.description})`, 'info');
+
+                // Stop countdown timer and hide flip request
+                stopCountdown();
+                hideFlipRequest();
+                hideTurnDisplay();
+
+                // Update game state
+                state.gameState.currentFlip = flipNumber;
+                state.gameState.flippedCards.push(revealedCard);
+                state.gameState.dealerDeck = remainingCards;
+
+                // Show current flip card
+                displayCurrentFlipCard(revealedCard, playerName, scoreChange, rule.description);
+
+                // Add to flip history
+                addFlipToHistory(data);
+
+                // Update dealer deck display (remove flipped card)
+                updateDealerDeckDisplay();
+
+                // Update flip counter
+                document.getElementById('currentFlip').textContent = flipNumber;
+                document.getElementById('remainingCards').textContent = remainingCards.length;
+            });
+
+            socket.on('score_updated', (data) => {
+                logAll('score_updated received', data);
+                const scores = data.scores || {};
+                console.log("data_score_updated", data);
+
+                // Backend sends scores as { userId: scoreNumber }
+                const myScore = scores[state[`p${player}`].userId];
+                const scoreValue = myScore !== undefined ? myScore : 0;
+                log(player, `📢 Score updated: ${scoreValue}`, 'info');
+
+                // Update both players' scores
+                updateAllScores(scores);
+            });
+
+            socket.on('next_flip_ready', (data) => {
+                console.log("data_next_flip_ready", data);
+                const timeInSeconds = Math.ceil((data.timeLimit || 5000) / 1000);
+                const turnUsername = data.currentTurnUsername || 'Unknown';
+                const turnPlayerId = data.currentTurnPlayer;
+                const nextCard = data.nextCard;
+
+                log(player, `📢 Next flip ready #${data.flipNumber} - ${turnUsername}'s turn - Auto-flip in ${timeInSeconds}s`, 'info');
+
+                // Update state
+                state.gameState.currentTurnPlayer = turnPlayerId;
+                state.gameState.currentTurnUsername = turnUsername;
+                state.gameState.nextCard = nextCard;
+
+                // Show whose turn it is
+                showTurnDisplay(turnUsername, nextCard);
+
+                // Start countdown timer
+                startCountdown(timeInSeconds);
+
+                // Update button states
+                updateButtonStates();
+            });
+
+            socket.on('game_ended', (data) => {
+                console.log("data_game_ended", data);
+                const winner = data?.standings?.length > 0 ? data.standings[0] : null;
+                log(player, `📢 🏁 Game ended! Winner: ${winner.username} (Score: ${winner.score})`, 'success');
+                document.getElementById(`p${player}GameStatus`).textContent = 'COMPLETED';
+
+                // Update status
+                state.gameState.status = 'ENDED';
+
+                // Stop countdown timer
+                stopCountdown();
+                hideTurnDisplay();
+                hideFlipRequest();
+
+                // Update button states (disable all)
+                updateButtonStates();
+            });
+
+            socket.on('matchmaking_waiting', (data) => {
+                console.log("data_matchmaking_waiting", data);
+                log(player, `📢 Matchmaking: ${data.message}`, 'info');
+            });
+
+            socket.on('matchmaking_success', (data) => {
+                console.log("data_matchmaking_success", data);
+                log(player, `📢 Matchmaking success! ${data.message}`, 'success');
+            });
+
+            socket.on('flip_request_placed', (data) => {
+                console.log("data_flip_request_placed", data);
+                const username = data.requester?.username || 'Unknown player';
+                const requesterId = data.requester?.userId;
+                const amount = data.bidAmount || 0;
+
+                log(player, `📢 💰 Flip request: ${username} bid $${amount.toFixed(2)}`, 'info');
+
+                // Track active flip request
+                state.activeFlipRequest = requesterId;
+
+                // Show flip request in UI
+                showFlipRequest(username, amount);
+
+                // Stop countdown timer while flip request is active
+                stopCountdown();
+                hideTurnDisplay();
+
+                // Update button states
+                updateButtonStates();
+            });
+
+            socket.on('flip_request_rejected', (data) => {
+                console.log("data_flip_request_rejected", data);
+                log(player, `📢 ❌ Flip request rejected: ${data.reason}`, 'error');
+
+                // Clear active flip request
+                state.activeFlipRequest = null;
+
+                // Hide flip request display
+                hideFlipRequest();
+
+                // Update button states
+                updateButtonStates();
+            });
+
+            socket.on('flip_rights_granted', (data) => {
+                console.log("data_flip_rights_granted", data);
+                const grantedUsername = data.grantedTo?.username || 'Unknown';
+                const grantedUserId = data.grantedTo?.userId;
+                log(player, `📢 ✅ Flip rights granted to ${grantedUsername}`, 'success');
+
+                // Update turn to granted player
+                state.gameState.currentTurnPlayer = grantedUserId;
+                state.gameState.currentTurnUsername = grantedUsername;
+
+                // Clear active flip request
+                state.activeFlipRequest = null;
+
+                // Hide flip request display
+                hideFlipRequest();
+
+                // Note: Auto-flip will happen, so don't show turn or timer
+                // The flip will execute automatically after rights granted
+
+                // Update button states
+                updateButtonStates();
+            });
+
+            socket.on('chat_message', (data) => {
+                console.log('data_chat_message', data);
+                const senderUsername = data.senderUsername || 'Unknown';
+                const content = data.content || '';
+                const timestamp = new Date(data.timestamp).toLocaleTimeString();
+
+                displayChatMessage(player, senderUsername, content, timestamp, data.senderId === state[`p${player}`].userId);
+                log(player, `💬 Chat: ${senderUsername}: ${content}`, 'info');
+            });
+
+            socket.on('error', (error) => {
+                log(player, `❌ Socket error: ${error}`, 'error');
+            });
+
+            state[`p${player}`].socket = socket;
+        }
+
+        function disconnectSocket(player) {
+            if (state[`p${player}`].socket) {
+                state[`p${player}`].socket.disconnect();
+                state[`p${player}`].socket = null;
+                log(player, 'Disconnected from socket', 'info');
+                updateStatus(player, false);
+            }
+        }
+
+        function displayCards(player, cards) {
+            console.log("cards", cards);
+
+            const cardsEl = document.getElementById(`p${player}Cards`);
+            if (!cards || cards.length === 0) {
+                cardsEl.innerHTML = '<span class="text-muted">No cards</span>';
+                return;
+            }
+            cardsEl.innerHTML = cards.map(card =>
+                `<span class="card">${formatCard(card)}</span>`
+            ).join('');
+        }
+
+        // UI Update Functions
+        function updateGameState(data) {
+            const currentFlip = data.currentFlip || 0;
+            const gameLength = data.gameLength || 26;
+            const status = data.status || 'IN_PROGRESS';
+
+            document.getElementById('currentFlip').textContent = currentFlip;
+            document.getElementById('totalFlips').textContent = gameLength;
+            document.getElementById('remainingCards').textContent = gameLength - currentFlip;
+            document.getElementById('globalGameStatus').textContent = status;
+
+            logAll('Game state updated', { currentFlip, gameLength, status });
+        }
+
+        function displayCurrentFlipCard(card, playerName, score, ruleDesc) {
+            const cardEl = document.getElementById('currentFlipCard');
+            const infoEl = document.getElementById('currentFlipInfo');
+
+            cardEl.innerHTML = formatCard(card) || '?';
+            cardEl.className = 'flip-card-large';
+
+            const scoreText = score !== undefined ? score : 0;
+            const ruleText = ruleDesc || 'No rule';
+            const playerText = playerName || 'Unknown';
+
+            infoEl.innerHTML = `
+                <strong>${playerText}</strong> matched this card<br>
+                <span class="badge bg-success">+${scoreText} points</span><br>
+                <small>${ruleText}</small>
+            `;
+
+            logAll('Current flip card displayed', { card, playerName, score, ruleDesc });
+        }
+
+        function updateDealerDeckDisplay() {
+            const dealerEl = document.getElementById('dealerCards');
+            const remaining = state.gameState.dealerDeck.length;
+
+            if (remaining > 0) {
+                dealerEl.innerHTML = Array(remaining).fill(0).map(() =>
+                    `<span class="card card-back">🎴</span>`
+                ).join('');
+            } else {
+                dealerEl.innerHTML = '<span class="text-muted">All cards flipped</span>';
+            }
+
+            document.getElementById('remainingCards').textContent = remaining;
+            logAll('Dealer deck updated', { remaining, flipped: state.gameState.flippedCards.length });
+        }
+
+        function addFlipToHistory(data) {
+            console.log("addFlipToHistory", data);
+
+            const historyEl = document.getElementById('flipHistory');
+            const flipItem = document.createElement('div');
+            flipItem.className = 'flip-item';
+
+            const flipNumber = data.flipNumber || 0;
+            const revealedCard = data.revealedCard || 'Unknown';
+            const matchedPlayer = data.matchedPlayer || { userId: 'Unknown', username: 'Unknown', scoreChange: 0 };
+            const scoreChange = matchedPlayer.scoreChange || 0;
+            const ruleDesc = data.rule?.description || 'No description';
+
+            // Get username from backend data (preferred) or fallback to state
+            let playerName = matchedPlayer.username || 'Unknown';
+            if (playerName === 'Unknown') {
+                if (state.p1.userId === matchedPlayer.userId) {
+                    playerName = state.p1.username || 'Player 1';
+                } else if (state.p2.userId === matchedPlayer.userId) {
+                    playerName = state.p2.username || 'Player 2';
+                }
+            }
+
+            flipItem.innerHTML = `
+                <strong>Flip #${flipNumber}</strong>: 
+                Card ${formatCard(revealedCard)} → 
+                <strong>${playerName}</strong> 
+                <span class="badge bg-success">+${scoreChange}</span>
+                <br><small class="text-muted">${ruleDesc}</small>
+            `;
+            historyEl.insertBefore(flipItem, historyEl.firstChild);
+
+            logAll('Added to flip history', { flipNumber, revealedCard, playerName, scoreChange });
+            getCards(1)
+            getCards(2)
+        }
+
+        function updateOpponentInfo(player, players) {
+            const opponentInfoEl = document.getElementById(`p${player}OpponentInfo`);
+            const currentUserId = state[`p${player}`].userId;
+            const playersArray = Array.isArray(players) ? players : [];
+            const opponents = playersArray.filter(p => p && p.userId !== currentUserId);
+
+            if (opponents.length > 0) {
+                opponentInfoEl.innerHTML = opponents.map(opp => {
+                    const username = opp.username || 'Unknown';
+                    const cardCount = opp.cardCount || 0;
+                    return `
+                        <div class="mb-2">
+                            <strong>${username}</strong>: ${cardCount} cards
+                            <div class="card-display">
+                                ${Array(cardCount).fill(0).map(() => '<span class="card card-back">🎴</span>').join('')}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                opponentInfoEl.innerHTML = 'No opponents';
+            }
+
+            logAll('Opponent info updated', { player, opponentsCount: opponents.length });
+        }
+
+        function updateAllScores(scores) {
+            const scoresObj = scores || {};
+            logAll('Updating all scores', scoresObj);
+
+            // Backend sends scores as { userId: scoreNumber }
+            Object.keys(scoresObj).forEach(userId => {
+                const score = scoresObj[userId] !== undefined ? scoresObj[userId] : 0;
+
+                if (state.p1.userId === userId) {
+                    document.getElementById('p1Score').textContent = score;
+                    logAll('P1 score updated', { score });
+                } else if (state.p2.userId === userId) {
+                    document.getElementById('p2Score').textContent = score;
+                    logAll('P2 score updated', { score });
+                }
+            });
+        }
+
+        // Chat Functions
+        function sendChat(player) {
+            const socket = state[`p${player}`].socket;
+            const roomId = state[`p${player}`].roomId;
+            const inputEl = document.getElementById(`p${player}ChatInput`);
+            const message = inputEl.value.trim();
+
+            if (!socket) {
+                log(player, '❌ Socket not connected', 'error');
+                return;
+            }
+
+            if (!roomId) {
+                log(player, '❌ Not in a room', 'error');
+                return;
+            }
+
+            if (!message) {
+                return; // Don't send empty messages
+            }
+
+            log(player, `💬 Sending chat: ${message}`);
+
+            socket.emit('chat_message', {
+                roomId,
+                messageType: 'TEXT',
+                content: message
+            });
+
+            // Clear input
+            inputEl.value = '';
+        }
+
+        function displayChatMessage(player, username, content, timestamp, isMe) {
+            const chatEl = document.getElementById(`p${player}Chat`);
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                padding: 5px;
+                margin: 3px 0;
+                border-radius: 3px;
+                font-size: 12px;
+                ${isMe ? 'background: #e7f3ff; text-align: right;' : 'background: #f8f9fa;'}
+            `;
+            messageDiv.innerHTML = `
+                <strong style="color: ${isMe ? '#0d6efd' : '#198754'};">${username}:</strong>
+                <span>${content}</span>
+                <small style="color: #6c757d; margin-left: 5px;">${timestamp}</small>
+            `;
+            chatEl.appendChild(messageDiv);
+            chatEl.scrollTop = chatEl.scrollHeight;
+        }
+
+        // Room Actions
+        function createRoom(player) {
+            const socket = state[`p${player}`].socket;
+            if (!socket) {
+                log(player, '❌ Socket not connected', 'error');
+                return;
+            }
+
+            const gameLength = parseInt(document.getElementById('gameLength').value);
+            const maxPlayers = parseInt(document.getElementById('maxPlayers').value);
+            const betMultiplier = parseInt(document.getElementById('betMultiplier').value);
+
+            const roomData = {
+                gameLength,
+                maxPlayers,
+                betMultiplier,
+                baseBetAmount: 25,
+                roomType: 'PUBLIC'
+            };
+
+            log(player, `Creating room: ${JSON.stringify(roomData)}`);
+
+            socket.emit('create_room', roomData, (response) => {
+                if (response.ok) {
+                    state[`p${player}`].roomId = response.room._id;
+                    document.getElementById(`p${player}RoomId`).textContent = response.room._id;
+                    document.getElementById('roomCode').value = response.room.code || response.room._id;
+                    log(player, `✅ Room created: ${response.room._id}`, 'success');
+                    document.getElementById(`p${player}GameStatus`).textContent = 'WAITING';
+                } else {
+                    log(player, `❌ Create room failed: ${response.error}`, 'error');
+                }
+            });
+        }
+
+        function joinRoom(player) {
+            const socket = state[`p${player}`].socket;
+            if (!socket) {
+                log(player, '❌ Socket not connected', 'error');
+                return;
+            }
+
+            const roomCode = document.getElementById('roomCode').value.trim();
+            if (!roomCode) {
+                log(player, '❌ Please enter room code', 'error');
+                return;
+            }
+
+            log(player, `Joining room: ${roomCode}`);
+
+            socket.emit('join_room', {
+                code: roomCode,
+                joinMethod: 'ROOM_CODE'
+            }, (response) => {
+                if (response.ok) {
+                    state[`p${player}`].roomId = response.room._id;
+                    document.getElementById(`p${player}RoomId`).textContent = response.room._id;
+                    log(player, `✅ Joined room: ${response.room._id}`, 'success');
+                    document.getElementById(`p${player}GameStatus`).textContent = `WAITING (${response.room.currentPlayers}/${response.room.maxPlayers})`;
+                } else {
+                    log(player, `❌ Join room failed: ${response.error}`, 'error');
+                }
+            });
+        }
+
+        function startGame(player) {
+            const socket = state[`p${player}`].socket;
+            const roomId = state[`p${player}`].roomId;
+
+            if (!socket) {
+                log(player, '❌ Socket not connected', 'error');
+                return;
+            }
+            if (!roomId) {
+                log(player, '❌ Not in a room', 'error');
+                return;
+            }
+
+            log(player, `Starting game in room: ${roomId}`);
+
+            socket.emit('start_game', { roomId }, (response) => {
+                if (response.ok) {
+                    log(player, `✅ Game started!`, 'success');
+                } else {
+                    log(player, `❌ Start game failed: ${response.error}`, 'error');
+                }
+            });
+        }
+
+        // REST API Actions
+        async function getCards(player) {
+            const token = state[`p${player}`].token;
+            const roomId = state[`p${player}`].roomId;
+
+            if (!token || !roomId) {
+                log(player, '❌ Not authenticated or not in room', 'error');
+                return;
+            }
+
+            log(player, 'Getting my cards...');
+
+            try {
+                const res = await fetch(`${getServerUrl()}/api/v1/game/${roomId}/cards`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                console.log("data-getCards", data);
+
+                if (data.status && data.data) {
+                    const cards = data.data.cards || [];
+                    const cardCount = data.data.cardCount || cards.length;
+                    displayCards(player, cards);
+                    document.getElementById(`p${player}CardCount`).textContent = cardCount;
+                    log(player, `✅ Got ${cardCount} cards: [${cards.join(', ')}]`, 'success');
+                } else {
+                    log(player, `❌ Failed: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (err) {
+                log(player, `❌ Error: ${err.message}`, 'error');
+            }
+        }
+
+        async function getScores(player) {
+            const token = state[`p${player}`].token;
+            const roomId = state[`p${player}`].roomId;
+
+            if (!token || !roomId) {
+                log(player, '❌ Not authenticated or not in room', 'error');
+                return;
+            }
+
+            log(player, 'Getting scores...');
+
+            try {
+                const res = await fetch(`${getServerUrl()}/api/v1/game/${roomId}/scores`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+                console.log("data-getScores", data);
+
+                if (data.status && data.data) {
+                    const scores = data.data.scores || [];
+                    log(player, `📊 Scores: ${JSON.stringify(scores)}`, 'success');
+
+                    // Find current player's score
+                    const myScore = scores.find(s => s.userId === state[`p${player}`].userId);
+                    if (myScore) {
+                        const score = myScore.score !== undefined ? myScore.score : 0;
+                        const cardsRemaining = myScore.cardsRemaining !== undefined ? myScore.cardsRemaining : 0;
+                        document.getElementById(`p${player}Score`).textContent = score;
+                        document.getElementById(`p${player}CardCount`).textContent = cardsRemaining;
+                    }
+
+                    // Update all players' scores
+                    scores.forEach(s => {
+                        if (state.p1.userId === s.userId) {
+                            document.getElementById('p1Score').textContent = s.score || 0;
+                            document.getElementById('p1CardCount').textContent = s.cardsRemaining || 0;
+                        } else if (state.p2.userId === s.userId) {
+                            document.getElementById('p2Score').textContent = s.score || 0;
+                            document.getElementById('p2CardCount').textContent = s.cardsRemaining || 0;
+                        }
+                    });
+                } else {
+                    log(player, `❌ Failed: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (err) {
+                log(player, `❌ Error: ${err.message}`, 'error');
+            }
+        }
+
+        async function getGameState(player) {
+            const token = state[`p${player}`].token;
+            const roomId = state[`p${player}`].roomId;
+
+            if (!token || !roomId) {
+                log(player, '❌ Not authenticated or not in room', 'error');
+                return;
+            }
+
+            log(player, 'Getting game state...');
+
+            try {
+                const res = await fetch(`${getServerUrl()}/api/v1/game/${roomId}/state`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await res.json();
+
+                if (data.status) {
+                    log(player, `🎮 Game State: Status=${data.data.status}, Length=${data.data.gameLength}`, 'success');
+                } else {
+                    log(player, `❌ Failed: ${data.message}`, 'error');
+                }
+            } catch (err) {
+                log(player, `❌ Error: ${err.message}`, 'error');
+            }
+        }
+
+        // Flip Actions
+        async function executeFlip(player) {
+            const token = state[`p${player}`].token;
+            const roomId = state[`p${player}`].roomId;
+
+            if (!token || !roomId) {
+                log(player, '❌ Not authenticated or not in room', 'error');
+                return;
+            }
+
+            log(player, `⏳ Executing flip...`);
+
+            try {
+                const res = await fetch(`${getServerUrl()}/api/v1/flip/${roomId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                console.log("data-executeFlip", data);
+
+                if (data.status) {
+                    log(player, `✅ Flip executed! Card will be revealed via socket event`, 'success');
+                } else {
+                    log(player, `❌ Flip failed: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (err) {
+                log(player, `❌ Error: ${err.message}`, 'error');
+            }
+        }
+
+        async function placeBid(player) {
+            const token = state[`p${player}`].token;
+            const roomId = state[`p${player}`].roomId;
+            const bidAmount = parseFloat(document.getElementById(`p${player}BidAmount`).value);
+
+            if (!token || !roomId) {
+                log(player, '❌ Not authenticated or not in room', 'error');
+                return;
+            }
+
+            if (isNaN(bidAmount) || bidAmount <= 0) {
+                log(player, '❌ Invalid bid amount. Must be greater than 0', 'error');
+                return;
+            }
+
+            log(player, `💰 Placing bid: $${bidAmount.toFixed(2)}...`);
+
+            try {
+                const res = await fetch(`${getServerUrl()}/api/v1/game/flip-request`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ roomId, bidAmount })
+                });
+                const data = await res.json();
+                console.log("data-placeBid", data);
+
+                if (data.status) {
+                    log(player, `✅ Flip request placed: $${bidAmount.toFixed(2)} - Wait for approval`, 'success');
+                } else {
+                    log(player, `❌ Flip request failed: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (err) {
+                log(player, `❌ Error: ${err.message}`, 'error');
+            }
+        }
+
+        // Quick Test Flow
+        async function quickTestFlow() {
+            clearAllLogs();
+            log(1, '🚀 Starting automated test flow...');
+            log(2, '🚀 Starting automated test flow...');
+
+            // Step 1: Login both players
+            await login(1);
+            await new Promise(r => setTimeout(r, 500));
+            await login(2);
+            await new Promise(r => setTimeout(r, 500));
+
+            // Step 3: Connect sockets
+            connectSocket(1);
+            await new Promise(r => setTimeout(r, 1000));
+            connectSocket(2);
+            await new Promise(r => setTimeout(r, 1000));
+
+            // Step 4: Player 1 creates room
+            createRoom(1);
+            await new Promise(r => setTimeout(r, 2000));
+
+            // Step 5: Player 2 joins room
+            joinRoom(2);
+            await new Promise(r => setTimeout(r, 1000));
+
+            log(1, '✅ Test flow complete! Game should auto-start now.', 'success');
+            log(2, '✅ Test flow complete! Game should auto-start now.', 'success');
+        }
+
+        // Initialize
+        log(1, 'Welcome! Configure settings and click buttons to test.');
+        log(2, 'Welcome! Configure settings and click buttons to test.');
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,2206 @@
+{
+	"info": {
+		"_postman_id": "261d6b9a-5ae5-4bc9-bf68-2398a7df8079",
+		"name": "CardGame Backend API version 1",
+		"description": "Complete API collection for CardGame Backend with sample payloads",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "25710894",
+		"_collection_link": "https://codefighter.postman.co/workspace/Personal-Workspace~5735433a-98a6-495c-b2c7-b0b5df0c8e5b/collection/25710894-261d6b9a-5ae5-4bc9-bf68-2398a7df8079?action=share&source=collection_link&creator=25710894"
+	},
+	"item": [
+		{
+			"name": "01. Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('authToken', response.data.token);",
+									"    pm.collectionVariables.set('userId', response.data.user._id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"john_doe03\",\n  \"email\": \"user03@yopmail.com\",\n  \"location\": \"123 Main Street\",\n  \"state\": \"California\",\n  \"phone\": \"+1234567890\",\n  \"street\": \"Main Street\",\n  \"city\": \"Los Angeles\",\n  \"zipcode\": \"90001\",\n  \"password\": \"securePassword123\",\n  \"confirmPassword\": \"securePassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('authToken', response.data.token);",
+									"    pm.collectionVariables.set('userId', response.data.user._id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n//  \"email\": \"john.doe@example.com\",\n//   \"password\": \"securePassword123\"\n//  \"email\": \"user01@yopmail.com\",\n//   \"password\": \"securePassword123\"\n//  \"email\": \"user02@yopmail.com\",\n//   \"password\": \"securePassword123\"\n \"email\": \"user03@yopmail.com\",\n  \"password\": \"securePassword123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('adminToken', response.data.token);",
+									"    pm.collectionVariables.set('userId', response.data.user._id);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n \"email\": \"admin@gmail.com\",\n  \"password\": \"Admin@123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Google Login",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idToken\": \"google_oauth_id_token_here\",\n  \"email\": \"user@gmail.com\",\n  \"name\": \"John Doe\",\n  \"googleId\": \"google_user_id\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/google",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"google"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Profile",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\"email\": \"updated.email@example.com\",\n  \"location\": \"456 Oak Avenue\",\n  \"state\": \"New York\",\n  \"phone\": \"+1987654321\",\n  \"street\": \"Oak Avenue\",\n  \"city\": \"New York City\",\n  \"zipcode\": \"10001\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02. Mode Selection",
+			"item": [
+				{
+					"name": "Select Mode",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"mode\": \"REAL_MONEY\" // REAL_MONEY , FREE_COIN\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/modes/select",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"modes",
+								"select"
+							]
+						},
+						"description": "Select mode: FREE_COIN or REAL_MONEY"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current Mode",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/modes/current",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"modes",
+								"current"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Mode Session",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/modes/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"modes",
+								"refresh"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03. Wallet & Payment",
+			"item": [
+				{
+					"name": "Get Wallet Balance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/wallet",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"wallet"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Buy Coins",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"packageId\": \"COIN_PKG_5\" // //COIN_PKG_1  200 //COIN_PKG_5  1000 //COIN_PKG_10  2500 // COIN_PKG_20  5500\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/wallet/buy-coins",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"wallet",
+								"buy-coins"
+							]
+						},
+						"description": "Packages: COIN_PKG_1 ($1/200 coins), COIN_PKG_5 ($5/1000 coins), COIN_PKG_10 ($10/2500 coins), COIN_PKG_20 ($20/5500 coins)"
+					},
+					"response": []
+				},
+				{
+					"name": "Grant Ad Reward",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"adId\": \"ad_12345\",\n  \"adRevenue\": 1\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/wallet/ad-reward",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"wallet",
+								"ad-reward"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Lock Entry Fee",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 100,\n  \"gameMode\": \"FREE_COIN\", // REAL_MONEY  FREE_COIN\n  \"roomId\": \"{{roomId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/wallet/lock-entry-fee",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"wallet",
+								"lock-entry-fee"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unlock Entry Fee",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 100,\n  \"gameMode\": \"FREE_COIN\", // REAL_MONEY  FREE_COIN\n  \"roomId\": \"{{roomId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/wallet/unlock-entry-fee",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"wallet",
+								"unlock-entry-fee"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Initiate Deposit",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 100,\n  \"paymentMethod\": \"CREDIT_CARD\", // CREDIT_CARD PAYPAL GOOGLE_PAY,\n  \"returnUrl\" : \"https://open.spotify.com/playlist/6423RwGfIBXVrNBfyh2hcz\",\n  \"cancelUrl\" : \"https://open.spotify.com/playlist/6423RwGfIBXVrNBfyh2hcz\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments/deposit/initiate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments",
+								"deposit",
+								"initiate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/history",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"payments",
+								"history"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "DEPOSIT",
+									"description": "\"DEPOSIT\", \"REFUND\"",
+									"disabled": true
+								},
+								{
+									"key": "status",
+									"value": "PENDING",
+									"description": " \"PENDING\", \"PROCESSING\", \"COMPLETED\", \"FAILED\", \"REFUNDED\", \"CANCELLED\"",
+									"disabled": true
+								},
+								{
+									"key": "paymentMethod",
+									"value": "CREDIT_CARD",
+									"description": "CREDIT_CARD PAYPAL GOOGLE_PAY",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "startDate",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "endDate",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "04. Room Management",
+			"item": [
+				{
+					"name": "Create Room",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data._id) {",
+									"        pm.collectionVariables.set('roomId', response.data._id);",
+									"    } else if (response.data && response.data.roomId) {",
+									"        pm.collectionVariables.set('roomId', response.data.roomId);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roomType\": \"PRIVATE\", // optional, enum: \"PUBLIC\" | \"PRIVATE\"\n  \"isPrivate\": true, // optional (Legacy field)\n  \"gameLength\": 26, // required, enum: 26 | 52\n  \"deck\": 52, // optional, enum: 52 | 39 | 26\n  \"maxPlayers\": 2, // required, enum: 2 | 4 | 13\n  \"betMultiplier\": 5, // required, min: 1 (integer)\n  \"baseBetAmount\": 100, // optional, min: 25\n  \"scheduledStartTime\": \"2026-01-05T15:00:00.000Z\", // optional, ISO date string\n  \"walletType\": \"REAL_MONEY\" // optional, enum: \"FREE_COIN\" | \"REAL_MONEY\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/room/create",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"room",
+								"create"
+							]
+						},
+						"description": "deckType: FULL (52), HALF (39), QUARTER (26)\ngameRule: same_suit_loose, same_suit_bonus, no_bonus"
+					},
+					"response": []
+				},
+				{
+					"name": "Join Room - Matchmaking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"joinMethod\": \"MATCHMAKING\",\n  \"gameLength\": 26,\n  \"betMultiplier\": 1\n//   \"code\": \"XYZ789\", // optional (legacy)\n//   \"roomId\": \"507f1f77bcf86cd799439011\", // optional (legacy)\n//   \"seat\": 3, // optional (legacy)\n//   \"socketId\": \"abc123socket\" // optional (legacy)\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/room/join",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"room",
+								"join"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join Room - Room Code",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"joinMethod\": \"ROOM_CODE\",\n  \"roomCode\": \"RMGJ2U\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/room/join",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"room",
+								"join"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Join Room - Invitation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "invitationToken",
+								"value": "invitationToken",
+								"type": "text",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"joinMethod\": \"INVITATION\",\n  \"invitationToken\": \"invitationToken\",\n  \"roomId\": \"{{roomId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/room/join",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"room",
+								"join"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Schedule Room",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"roomType\": \"PRIVATE\", // required, enum: \"PUBLIC\" | \"PRIVATE\"\n  \"gameLength\": 52, // required, enum: 26 | 52\n  \"maxPlayers\": 4, // required, enum: 2 | 4 | 13\n  \"betMultiplier\": 5, // required, min: 1 (integer)\n  \"baseBetAmount\": 250, // optional, min: 25\n  \"scheduledStartTime\": \"2025-12-31T22:30:00.000Z\", // required, ISO date string\n  \"inviteFriends\": [\"507f1f77bcf86cd799439011\", \"507f191e810c19729de860ea\"] // optional, array of user IDs\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/room/schedule",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"room",
+								"schedule"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List Available Rooms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/room/list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"room",
+								"list"
+							],
+							"query": [
+								{
+									"key": "entryFee",
+									"value": "100",
+									"disabled": true
+								},
+								{
+									"key": "maxPlayers",
+									"value": "4",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Room by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/room/{{roomId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"room",
+								"{{roomId}}"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "05. Game Play",
+			"item": [
+				{
+					"name": "Start Game",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/game/start/{{roomId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"game",
+								"start",
+								"{{roomId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Game State",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/game/{{roomId}}/state",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"game",
+								"{{roomId}}",
+								"state"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Player Cards",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/game/{{roomId}}/cards",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"game",
+								"{{roomId}}",
+								"cards"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Game Scores",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/game/{{roomId}}/scores",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"game",
+								"{{roomId}}",
+								"scores"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "06. Flip Actions",
+			"item": [
+				{
+					"name": "Player Flip",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/flip/{{roomId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"flip",
+								"{{roomId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Flip History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/flip/{{roomId}}/history",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"flip",
+								"{{roomId}}",
+								"history"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Flip Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/flip/{{roomId}}/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"flip",
+								"{{roomId}}",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "07. Friends & Social",
+			"item": [
+				{
+					"name": "Search Users",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"query\": \"john\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/friends/search",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friends",
+								"search"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Send Friend Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"friendId\": \"694037b5c501cb44b16295dd\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/friends/request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friends",
+								"request"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Accept Friend Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestId\": \"friendship_1767192713632_yjpfyoaob\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/friends/accept",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friends",
+								"accept"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Friend Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"requestId\": \"friendship_id_here\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/friends/reject",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friends",
+								"reject"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Friend",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/friends/{{frdId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friends",
+								"{{frdId}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Friend List",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/friends/list",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friends",
+								"list"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Friend Requests",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/friends/requests",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friends",
+								"requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get User Profile",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/friends/profile/6954151bb5c7e2c1a7ca0541",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"friends",
+								"profile",
+								"6954151bb5c7e2c1a7ca0541"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "08. KYC Verification",
+			"item": [
+				{
+					"name": "Initiate KYC",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"idType\": \"DRIVERS_LICENSE\", // \"DRIVERS_LICENSE\", \"PASSPORT\", \"NATIONAL_ID\"\n  \"country\": \"in\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/kyc/initiate",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"kyc",
+								"initiate"
+							]
+						},
+						"description": "Provider: ONFIDO or JUMIO"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit KYC Documents",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"kycId\": \"695bf5b09f0df437645afc92\",\n  \"idNumber\": \"DL1234567890\",\n  \"documentUrls\": {\n   \"front\": \"http://localhost:3000/kyc/69589a92eed211daee385531/front-1767635648323-210888662.jpg\",\n            \"back\": \"http://localhost:3000/kyc/69589a92eed211daee385531/back-1767635648325-170244319.jpg\",\n            \"selfie\": \"http://localhost:3000/kyc/69589a92eed211daee385531/selfie-1767635648326-169717575.jpg\"\n  },\n  \"personalInfo\": {\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"dateOfBirth\": \"1990-05-15\",\n    \"address\": \"123 Main Street\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"postalCode\": \"10001\",\n    \"country\": \"US\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/kyc/submit",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"kyc",
+								"submit"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get KYC Status",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/kyc/status",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"kyc",
+								"status"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "09. Withdrawal",
+			"item": [
+				{
+					"name": "Request Withdrawal",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"amount\": 150, // required, number, min: 50\n  \"method\": \"BANK_ACCOUNT\", // required, enum: \"BANK_ACCOUNT\" | \"PAYPAL\" | \"GOOGLE_WALLET\"\n  \"destination\": { // required, object containing ONE of the payment methods below\n    \"bankAccount\": { // optional, use when method = \"BANK_ACCOUNT\"\n      \"accountNumber\": \"9876543210\", // required string\n      \"routingNumber\": \"111000025\", // required string\n      \"accountHolderName\": \"Jane Smith\", // required string\n      \"bankName\": \"Bank of America\" // optional string\n    },\n    \"paypal\": { // optional, use when method = \"PAYPAL\"\n      \"email\": \"user@paypal.com\" // required, valid email format\n    },\n    \"googleWallet\": { // optional, use when method = \"GOOGLE_WALLET\"\n      \"email\": \"user@gmail.com\" // required, valid email format\n    }\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/withdrawals/request",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"withdrawals",
+								"request"
+							]
+						},
+						"description": "Method: BANK_ACCOUNT, PAYPAL, GOOGLE_WALLET\nMin amount: $50"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Withdrawal Details",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/withdrawals/695814c50291f7191407072f",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"withdrawals",
+								"695814c50291f7191407072f"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Withdrawal History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/withdrawals/history?status=COMPLETED&offset=1&limit=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"withdrawals",
+								"history"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "COMPLETED"
+								},
+								{
+									"key": "offset",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Withdrawal",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/withdrawals/6958133239234e2536d9278a/cancel",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"withdrawals",
+								"6958133239234e2536d9278a",
+								"cancel"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "10. Notifications",
+			"item": [
+				{
+					"name": "Get Notifications",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications?type=WITHDRAWAL_COMPLETED&limit=10&offset=0",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"notifications"
+							],
+							"query": [
+								{
+									"key": "type",
+									"value": "WITHDRAWAL_COMPLETED",
+									"description": "FRIEND_REQUEST_RECEIVED, FRIEND_REQUEST_ACCEPTED, GAME_INVITATION, GAME_REMINDER_15MIN, GAME_REMINDER_5MIN, FRIENDS_ONLINE, DEPOSIT_COMPLETED, WITHDRAWAL_COMPLETED, KYC_APPROVED, KYC_REJECTED, NEW_FEATURE, SYSTEM_ANNOUNCEMENT"
+								},
+								{
+									"key": "unreadOnly",
+									"value": "true",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": "10"
+								},
+								{
+									"key": "offset",
+									"value": "0"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark Notification as Read",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/notification_id_here/read",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"notifications",
+								"notification_id_here",
+								"read"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark All as Read",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/read-all",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"notifications",
+								"read-all"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notification Preferences",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/notifications/preferences",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"notifications",
+								"preferences"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update Notification Preferences",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n        \"enabled\": {\n            \"friendRequests\": true,\n            \"gameInvitations\": true,\n            \"scheduledGameReminders\": true,\n            \"friendsOnline\": true,\n            \"transactions\": true,\n            \"newFeatures\": true,\n            \"systemAnnouncements\": true\n        },\n        \"quietHours\": {\n            \"enabled\": false,\n            \"startTime\": \"22:00\",\n            \"endTime\": \"08:00\",\n            \"timezone\": \"UTC\"\n        },\n        \"pushEnabled\": true,\n        \"inAppEnabled\": true\n    }"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/notifications/preferences",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"notifications",
+								"preferences"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "11. Leaderboard",
+			"item": [
+				{
+					"name": "Get Global Leaderboard",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/leaderboard/global?period=WEEKLY",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"leaderboard",
+								"global"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "WEEKLY"
+								}
+							]
+						},
+						"description": "Period: DAILY, WEEKLY, MONTHLY, ALL_TIME"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Friends Leaderboard",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": []
+						},
+						"url": {
+							"raw": "{{baseUrl}}/leaderboard/friends?period=MONTHLY",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"leaderboard",
+								"friends"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "MONTHLY",
+									"description": "\"DAILY\", \"WEEKLY\", \"MONTHLY\", \"ALL_TIME\""
+								},
+								{
+									"key": "gameMode",
+									"value": "FREE_COIN",
+									"description": "\"FREE_COIN\", \"REAL_MONEY\"",
+									"disabled": true
+								},
+								{
+									"key": "limit",
+									"value": null,
+									"disabled": true
+								},
+								{
+									"key": "offset",
+									"value": null,
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Player Stats",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/leaderboard/stats/player/6954151bb5c7e2c1a7ca0541",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"leaderboard",
+								"stats",
+								"player",
+								"6954151bb5c7e2c1a7ca0541"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "12. Chat ( WAITING ROOM )",
+			"item": [
+				{
+					"name": "Get Chat History",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chat/history/{{roomId}}?page=1&limit=50",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"history",
+								"{{roomId}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "limit",
+									"value": "50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Chat Quick",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chat/quick-messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"quick-messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mute User (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"user_id_to_mute\",\n  \"roomId\": \"{{roomId}}\",\n  \"duration\": 3600,\n  \"reason\": \"Spam or inappropriate language\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/mute",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"mute"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Unmute User (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"user_id_to_unmute\",\n  \"roomId\": \"{{roomId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/unmute",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"unmute"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "12. Chat Friends",
+			"item": [
+				{
+					"name": "Get Chat Quick",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/chat/quick-messages",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"quick-messages"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Direct Msg",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"recipientId\" : \"6954151bb5c7e2c1a7ca0541\",\r\n    \"content\" : \"test 01\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/direct",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"direct"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Direct Msg List",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/direct/6954151bb5c7e2c1a7ca0541",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"direct",
+								"6954151bb5c7e2c1a7ca0541"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "read conv",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/read/conv_6954151bb5c7e2c1a7ca0541_695552d32353b64a62a786b4",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"read",
+								"conv_6954151bb5c7e2c1a7ca0541_695552d32353b64a62a786b4"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "conversations",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/chat/conversations",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"chat",
+								"conversations"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "13. Admin Panel",
+			"item": [
+				{
+					"name": "Get Active Games",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/games/active",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"games",
+								"active"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Ban Player",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reason\": \"Cheating detected\",\n  \"duration\": \"7_DAYS\", // duration must be 7_DAYS, 30_DAYS, or PERMANENT\n  \"banType\": \"FULL\" // banType must be FULL or REAL_MONEY_ONLY\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/players/694037b5c501cb44b16295dd/ban",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"players",
+								"694037b5c501cb44b16295dd",
+								"ban"
+							]
+						},
+						"description": "Duration in seconds (604800 = 7 days)"
+					},
+					"response": []
+				},
+				{
+					"name": "Unban Player",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/players/694037b5c501cb44b16295dd/unban",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"players",
+								"694037b5c501cb44b16295dd",
+								"unban"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Issue Refund",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"userId\": \"user_id_here\",\n//   \"transactionId\": \"transaction_id_here\",\n  \"amount\": 100,\n  \"reason\": \"Game server error\",\n  \"gameMode\": \"FREE_COIN\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/refunds/issue",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"refunds",
+								"issue"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Dashboard Analytics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/analytics/dashboard?period=7d",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"analytics",
+								"dashboard"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "7d",
+									"description": "period must be 24h, 7d, or 30d"
+								}
+							]
+						},
+						"description": "Period: TODAY, LAST_7_DAYS, LAST_30_DAYS, LAST_90_DAYS"
+					},
+					"response": []
+				},
+				{
+					"name": "Resolve Dispute",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"disputeId\": \"dispute_id_here\",\n  \"resolution\": \"REFUND_FULL\",\n  \"refundAmount\": 100,\n  \"notes\": \"Game crashed due to server error\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/disputes/resolve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"disputes",
+								"resolve"
+							]
+						},
+						"description": "Resolution: REFUND_FULL, REFUND_PARTIAL, NO_REFUND, COMPENSATE"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Players",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/players/search?query=john",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"players",
+								"search"
+							],
+							"query": [
+								{
+									"key": "query",
+									"value": "john"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Audit Logs",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/audit-logs?action=BAN_PLAYER",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"audit-logs"
+							],
+							"query": [
+								{
+									"key": "action",
+									"value": "BAN_PLAYER"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "KYC list",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/admin/kyc/submissions",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"kyc",
+								"submissions"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "KYC APPROVE",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"level\" : \"STANDARD\" // \"BASIC\", \"STANDARD\", \"ENHANCED\"\r\n    // \"notes\" : \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/kyc/:kycId/approve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"kyc",
+								":kycId",
+								"approve"
+							],
+							"variable": [
+								{
+									"key": "kycId",
+									"value": "6956cf58af557828052332c6"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "KYC REJECT",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{adminToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"reason\" : \"Please upload real doc\"\r\n    // \"notes\" : \"\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/admin/kyc/:kycId/reject",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"admin",
+								"kyc",
+								":kycId",
+								"reject"
+							],
+							"variable": [
+								{
+									"key": "kycId",
+									"value": "6956ce679d642345cf037c6e"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{authToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "roomId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "adminToken",
+			"value": ""
+		}
+	]
+}

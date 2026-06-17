@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Socket.IO Full Test</title>
+    <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
+</head>
+
+<body>
+    <h1>Socket.IO Full Test Page</h1>
+
+    <div>
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" placeholder="Enter your user ID">
+        <button id="connectBtn">Connect</button>
+    </div>
+
+    <div>
+        <h2>Room Actions</h2>
+        <label for="roomId">Room ID:</label>
+        <input type="text" id="roomId" placeholder="Enter Room ID">
+        <label for="roomCode">Room Code:</label>
+        <input type="text" id="roomCode" placeholder="Enter Room Code">
+        <button id="createRoomBtn">Create Room</button>
+        <button id="joinRoomBtn">Join Room</button>
+        <button id="startGameBtn">Start Game</button>
+    </div>
+
+    <div>
+        <h3>Logs:</h3>
+        <textarea id="logs" rows="20" cols="80" readonly></textarea>
+    </div>
+
+    <script>
+        let socket;
+        const logs = document.getElementById("logs");
+
+        // Helper function to log messages
+        function logMessage(message) {
+            logs.value += message + "\n";
+            logs.scrollTop = logs.scrollHeight; // Auto-scroll to the bottom
+        }
+
+        // Connect to the Socket.IO server
+        document.getElementById("connectBtn").addEventListener("click", () => {
+            const userId = document.getElementById("userId").value;
+            if (!userId) {
+                alert("Please enter a User ID.");
+                return;
+            }
+
+            socket = io("http://localhost:5000", {
+                auth: { token: userId },
+            });
+
+            socket.on("connect", () => {
+                logMessage("✅ Connected to server. Socket ID: " + socket.id);
+            });
+
+            socket.on("disconnect", () => {
+                logMessage("❌ Disconnected from server.");
+            });
+
+            socket.on("player_joined", (data) => {
+                logMessage("🔔 Player joined: " + JSON.stringify(data));
+            });
+
+            socket.on("game_started", (data) => {
+                logMessage("🎮 Game started: " + JSON.stringify(data));
+            });
+
+            socket.on("deal", (data) => {
+                logMessage("🃏 Cards dealt: " + JSON.stringify(data));
+            });
+        });
+
+        // Create Room
+        document.getElementById("createRoomBtn").addEventListener("click", () => {
+            const isPrivate = confirm("Make the room private?");
+            const variant = prompt("Enter variant (e.g., 4):", "4");
+            const deck = prompt("Enter deck size (e.g., 52):", "52");
+            const rule = prompt("Enter rule (e.g., 1):", "1");
+            const stake = prompt("Enter stake amount:", "0");
+
+            socket.emit("create_room", { isPrivate, variant, deck, rule, stake }, (response) => {
+                if (response.ok) {
+                    logMessage("✅ Room created: " + JSON.stringify(response.room));
+                } else {
+                    logMessage("❌ Failed to create room: " + response.error);
+                }
+            });
+        });
+
+        // Join Room
+        document.getElementById("joinRoomBtn").addEventListener("click", () => {
+            const roomId = document.getElementById("roomId").value;
+            const roomCode = document.getElementById("roomCode").value;
+
+            if (!roomId && !roomCode) {
+                alert("Please enter a Room ID or Room Code.");
+                return;
+            }
+
+            socket.emit("join_room", { roomId, code: roomCode }, (response) => {
+                if (response.ok) {
+                    logMessage("✅ Joined room: " + JSON.stringify(response.room));
+                } else {
+                    logMessage("❌ Failed to join room: " + response.error);
+                }
+            });
+        });
+
+        // Start Game
+        document.getElementById("startGameBtn").addEventListener("click", () => {
+            const roomId = document.getElementById("roomId").value;
+
+            if (!roomId) {
+                alert("Please enter a Room ID.");
+                return;
+            }
+
+            socket.emit("start_game", { roomId }, (response) => {
+                if (response.ok) {
+                    logMessage("✅ Game started.");
+                } else {
+                    logMessage("❌ Failed to start game: " + response.error);
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
